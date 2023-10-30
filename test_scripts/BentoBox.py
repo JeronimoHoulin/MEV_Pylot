@@ -7,7 +7,7 @@ import time
 node = 'https://rpc-mainnet.maticvigil.com/'
 
 account_from = {
-    'private_key': 'f634dbc7af4cd9a63a5c16be82daeb15b4184bf1037c3d3621b5ac2a28a4ff10',
+    'private_key': '',
     'address': '0xc4558c1f12d4797db4d6919C9902D197f42e9127'
    }
 

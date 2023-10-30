@@ -16,7 +16,7 @@ print(f'Connected via HTTP: {w3.is_connected()}')
 w3.middleware_onion.inject(geth_poa_middleware, layer=0)
 chain_id = 137 # Polygon Mainnet ID
 account = {
-    'private_key': 'de323e4e7098afcb1687b57c2f7cfb17a7be03fa2e24b0e8341bb17eb3511dd6',
+    'private_key': '',
     'address':  Web3.to_checksum_address('0xaCd29F685C3bDf33588Aa90Bb65A69B4b098e62F') 
    }
 
