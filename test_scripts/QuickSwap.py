@@ -111,7 +111,7 @@ print("Sell Price: ", quote_sell, " USDT.")
 
 #wallet connection
 
-MM_Private_Key = 'de323e4e7098afcb1687b57c2f7cfb17a7be03fa2e24b0e8341bb17eb3511dd6'
+MM_Private_Key = ''
 Admin_Address = Web3.to_checksum_address('0xaCd29F685C3bDf33588Aa90Bb65A69B4b098e62F')
 
 
