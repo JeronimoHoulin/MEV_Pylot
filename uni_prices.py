@@ -19,9 +19,6 @@ w3 = Web3(Web3.HTTPProvider(HTTPS_PROVIDER))
 
 #inject middleware for POA chain Polygon
 w3.middleware_onion.inject(geth_poa_middleware, layer=0)
-chain_id = 137 # Polygon Mainnet ID
-
-
 
 
 
