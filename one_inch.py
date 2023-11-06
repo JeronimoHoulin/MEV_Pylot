@@ -43,7 +43,7 @@ def get_quote(token_in, token_out, amount_in):
     token_in_symbol = token_in_contract.functions.symbol().call()
     token_out_symbol = token_out_contract.functions.symbol().call()
 
-    amount_in = amount_in * token_in_decimals
+    amount_in = int(amount_in * token_in_decimals)
 
     oneinch_url = f'https://api.1inch.dev/swap/v5.2/137/quote?src={token_in}&dst={token_out}&amount={amount_in}'
 
@@ -51,9 +51,16 @@ def get_quote(token_in, token_out, amount_in):
                 
     if 'toAmount' in quote:
         amount_out = int(quote['toAmount'])
-        print(f'You can sell {amount_in / token_in_decimals} {token_in_symbol} for: {amount_out / token_out_decimals} {token_out_symbol}')
+        print()
+        print(f'Swap {amount_in / token_in_decimals} {token_in_symbol} for: {amount_out / token_out_decimals} {token_out_symbol}')
+        print()
+        amount_out = amount_out / token_out_decimals
+        return amount_out
     else:
         print(quote['description'])
+        return amount_out
+
+
 
 def approve_allowance(token_in, token_out, amount_in, address, private_key):
     
