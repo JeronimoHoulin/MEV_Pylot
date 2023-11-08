@@ -43,6 +43,9 @@ def get_quote(token_in, token_out, amount_in):
     token_in_symbol = token_in_contract.functions.symbol().call()
     token_out_symbol = token_out_contract.functions.symbol().call()
 
+    print(f"Fetching 1Inch aggregated quote for {token_out_symbol}...")
+
+
     amount_in = int(amount_in * token_in_decimals)
 
     oneinch_url = f'https://api.1inch.dev/swap/v5.2/137/quote?src={token_in}&dst={token_out}&amount={amount_in}'
@@ -58,6 +61,7 @@ def get_quote(token_in, token_out, amount_in):
         return amount_out
     else:
         print(quote['description'])
+        amount_out = 0
         return amount_out
 
 
