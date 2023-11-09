@@ -5,8 +5,8 @@ from web3.middleware import geth_poa_middleware
 import json
 import eth_abi.packed
 import requests
-
 import itertools
+
 
 #Connecting to ENV file
 os.chdir('C:/Users/jeron/OneDrive/Desktop/Projects/Web3py') #Your CWD
