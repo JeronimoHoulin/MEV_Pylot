@@ -43,6 +43,7 @@ def get_quote(token_in, token_out, amount_in):
     token_in_symbol = token_in_contract.functions.symbol().call()
     token_out_symbol = token_out_contract.functions.symbol().call()
 
+    print()
     print(f"Fetching 1Inch aggregated quote for {token_out_symbol}...")
 
 

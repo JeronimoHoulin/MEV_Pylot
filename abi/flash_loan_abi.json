@@ -1,0 +1,58 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "pool0",
+				"type": "address"
+			},
+			{
+				"internalType": "uint24",
+				"name": "fee1",
+				"type": "uint24"
+			},
+			{
+				"internalType": "address",
+				"name": "tokenIn",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "tokenOut",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amountIn",
+				"type": "uint256"
+			}
+		],
+		"name": "flashSwap",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "int256",
+				"name": "amount0",
+				"type": "int256"
+			},
+			{
+				"internalType": "int256",
+				"name": "amount1",
+				"type": "int256"
+			},
+			{
+				"internalType": "bytes",
+				"name": "data",
+				"type": "bytes"
+			}
+		],
+		"name": "uniswapV3SwapCallback",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+]
