@@ -30,7 +30,7 @@ os.chdir('C:/Users/jeron/OneDrive/Desktop/Projects/Web3py/abi') #Your CWD becaus
 
 WETH = Web3.to_checksum_address('0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619')
 token_through = Web3.to_checksum_address('0xc2132d05d31c914a87c6611c10748aeb04b58e8f')
-flash_swap_adrs = Web3.to_checksum_address('0x49d560c63ea7050bbc601052da60cd606cc08287')
+flash_swap_adrs = Web3.to_checksum_address('0x292adbf387eb77fef19b3c585abbc34cd17c763a')
 
 #params TO BE FOUD AUTOMATED:
 pool0, fee1, token_in, token_through, amount_in = Web3.to_checksum_address('0xBB98B3D2b18aeF63a3178023A920971cf5F29bE4'), 100, WETH, token_through, int(0.001 * 1e18)
