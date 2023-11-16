@@ -1,0 +1,209 @@
+{
+    "0x3840d6a1b96292c8e44991b5605e03245584585b": {
+        "token0": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "token1": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
+        "fee": "100",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000,
+        "token0_symbol": "WETH",
+        "token1_symbol": "USDT"
+    },
+    "0x4ccd010148379ea531d6c587cfdd60180196f9b1": {
+        "token0": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "token1": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
+        "fee": "3000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000,
+        "token0_symbol": "WETH",
+        "token1_symbol": "USDT"
+    },
+    "0xbb98b3d2b18aef63a3178023a920971cf5f29be4": {
+        "token0": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "token1": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
+        "fee": "500",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000,
+        "token0_symbol": "WETH",
+        "token1_symbol": "USDT"
+    },
+    "0xc21b964af2b0254580d44981d624335f2b7c6fb6": {
+        "token0": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "token1": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
+        "fee": "10000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000,
+        "token0_symbol": "WETH",
+        "token1_symbol": "USDT"
+    },
+    "0x3f82d2fe81904f0e74146a14904e5355ef476049": {
+        "token0": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "token1": "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
+        "fee": "10000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "WETH",
+        "token1_symbol": "DAI"
+    },
+    "0x67a9fe12fa6082d9d0203c84c6c56d3c4b269f28": {
+        "token0": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "token1": "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
+        "fee": "500",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "WETH",
+        "token1_symbol": "DAI"
+    },
+    "0x6bad0f9a89ca403bb91d253d385cec1a2b6eca97": {
+        "token0": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "token1": "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
+        "fee": "3000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "WETH",
+        "token1_symbol": "DAI"
+    },
+    "0x25fb97799f80433e422f47e75173314e54dae174": {
+        "token0": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "token1": "0xd6df932a45c0f255f85145f286ea0b292b21c90b",
+        "fee": "500",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "WETH",
+        "token1_symbol": "AAVE"
+    },
+    "0x2aceda63b5e958c45bd27d916ba701bc1dc08f7a": {
+        "token0": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "token1": "0xd6df932a45c0f255f85145f286ea0b292b21c90b",
+        "fee": "3000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "WETH",
+        "token1_symbol": "AAVE"
+    },
+    "0x313821e1cec96e4bc48acb9ad94e9978de7300df": {
+        "token0": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "token1": "0xd6df932a45c0f255f85145f286ea0b292b21c90b",
+        "fee": "10000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "WETH",
+        "token1_symbol": "AAVE"
+    },
+    "0x3dc10d7bfb94eeb009203e84a653e5764f71771d": {
+        "token0": "0x53e0bca35ec356bd5dddfebbd1fc0fd03fabad39",
+        "token1": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "fee": "500",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "LINK",
+        "token1_symbol": "WETH"
+    },
+    "0x3e31ab7f37c048fc6574189135d108df80f0ea26": {
+        "token0": "0x53e0bca35ec356bd5dddfebbd1fc0fd03fabad39",
+        "token1": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "fee": "3000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "LINK",
+        "token1_symbol": "WETH"
+    },
+    "0x5cb7076245a3134f7072f8395045e31c037aeb08": {
+        "token0": "0x53e0bca35ec356bd5dddfebbd1fc0fd03fabad39",
+        "token1": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "fee": "10000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "LINK",
+        "token1_symbol": "WETH"
+    },
+    "0x4f28eef4dde2bfa0bdb95a7efe586c3654e6cf07": {
+        "token0": "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6",
+        "token1": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "fee": "10000",
+        "token0_decimals": 100000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "WBTC",
+        "token1_symbol": "WETH"
+    },
+    "0x50eaedb835021e4a108b7290636d62e9765cc6d7": {
+        "token0": "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6",
+        "token1": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "fee": "500",
+        "token0_decimals": 100000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "WBTC",
+        "token1_symbol": "WETH"
+    },
+    "0x960fc6489c9b44da6ba330883dc1898b75a7b27b": {
+        "token0": "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6",
+        "token1": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "fee": "100",
+        "token0_decimals": 100000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "WBTC",
+        "token1_symbol": "WETH"
+    },
+    "0xfe343675878100b344802a6763fd373fdeed07a4": {
+        "token0": "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6",
+        "token1": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "fee": "3000",
+        "token0_decimals": 100000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "WBTC",
+        "token1_symbol": "WETH"
+    },
+    "0x357faf5843c7fd7fb4e34fbeabdac16eabe8a5bc": {
+        "token0": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "token1": "0xb33eaad8d922b1083446dc23f610c2567fb5180f",
+        "fee": "3000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "WETH",
+        "token1_symbol": "UNI"
+    },
+    "0x39cd971fdfbb2e11013b6e2b0a7865840c729cc9": {
+        "token0": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "token1": "0xb33eaad8d922b1083446dc23f610c2567fb5180f",
+        "fee": "10000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "WETH",
+        "token1_symbol": "UNI"
+    },
+    "0x0312692e9cadd3ddaace2e112a4e36397bd2f18a": {
+        "token0": "0x0b3f868e0be5597d5db7feb59e1cadbb0fdda50a",
+        "token1": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "fee": "3000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "SUSHI",
+        "token1_symbol": "WETH"
+    },
+    "0x374f98170f18d69c7d4a6242fffef7888c7687fa": {
+        "token0": "0x0b3f868e0be5597d5db7feb59e1cadbb0fdda50a",
+        "token1": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "fee": "10000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "SUSHI",
+        "token1_symbol": "WETH"
+    },
+    "0x4e4890723d73e45cc42bc0abba0d185ca1d645a9": {
+        "token0": "0x385eeac5cb85a38a9a07a70c73e0a3271cfb54a7",
+        "token1": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "fee": "3000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "GHST",
+        "token1_symbol": "WETH"
+    },
+    "0x8f16a8e864162ec84a2906646e08a561b5a7f72d": {
+        "token0": "0x385eeac5cb85a38a9a07a70c73e0a3271cfb54a7",
+        "token1": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "fee": "10000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "GHST",
+        "token1_symbol": "WETH"
+    }
+}

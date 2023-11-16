@@ -13,7 +13,7 @@ def get_whitelist_tokens():
 
     tokens = resp['tokens']
 
-    top_10_tokens = tokens[0:20]
+    top_10_tokens = tokens[3:10]
 
     for token in top_10_tokens:
         #print(token['address'])
