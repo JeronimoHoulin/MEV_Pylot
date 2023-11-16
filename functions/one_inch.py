@@ -65,7 +65,7 @@ def get_quote(token_in, token_out, amount_in):
         amount_out = 0
         return amount_out
 
-
+get_quote('0xc2132d05d31c914a87c6611c10748aeb04b58e8f', '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', 1)
 
 def approve_allowance(token_in, token_out, amount_in, address, private_key):
     
@@ -145,14 +145,3 @@ def execute_swap(token_in, token_out, amount_in, address, private_key):
     swap_data = requests.get(oneinch_url, headers=headers).json()
 
     print(swap_data)
-
-
-
-
-
-#get_quote(token_in, token_out, amount_in)
-#approve_allowance('0xc4558c1f12d4797db4d6919C9902D197f42e9127', 'pk', amount_in)
-#execute_swap(token_in, token_out, amount_in, '0xc4558c1f12d4797db4d6919C9902D197f42e9127', 'pk')
-
-def main(token_in, token_out, amount_in):
-    get_quote(token_in, token_out, amount_in)

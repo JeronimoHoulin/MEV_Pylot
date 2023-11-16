@@ -311,7 +311,7 @@ async def get_possible_flashswap(used_pool, weth_amt):
         for fee in all_fees:
 
             amount0 = int( weth_amt * weth_decimals * 0.2) # start by testing 20% of the traded amount in pool x
-            max_amount = int(weth_amt * weth_decimals)        #increase test amount by 2 untill 100% of traded amount. 
+            max_amount = int(1.5 * weth_decimals)        #increase test amount by 2 untill 100% of traded amount. 
 
             if fee == fee0: #Same pool
                 pass
@@ -332,7 +332,7 @@ async def get_possible_flashswap(used_pool, weth_amt):
                     ).call()[0]
 
 
-                    if amount_first > amount0: #* amount0 / weth_decimals:
+                    if amount_first > 0: #* amount0 / weth_decimals:
                         
                         #print(f'From pool fee: {fee0} to pool: {fee}')
                         #print(f'{amount0 / weth_decimals} {weth_symbol} ->  {othr_symbol} -> {amount_first/weth_decimals} {weth_symbol}.')
@@ -343,13 +343,12 @@ async def get_possible_flashswap(used_pool, weth_amt):
                     amount0 = 2 * amount0
 
 
-
-    elif weth_amt > 0: #WETH BOUGHT IN POOL FEE0
+    else: #WETH BOUGHT IN POOL FEE0
 
         for fee in all_fees:
 
             amount0 = int( weth_amt * weth_decimals * 0.2) # start by testing 20% of the traded amount in pool x
-            max_amount = int(weth_amt * weth_decimals)        #increase test amount by 2 untill 100% of traded amount. 
+            max_amount = int(1.5 * weth_decimals)        #increase test amount by 2 untill 100% of traded amount. 
 
             if fee == fee0:
                 pass
@@ -367,7 +366,7 @@ async def get_possible_flashswap(used_pool, weth_amt):
                     ).call()[0]
 
 
-                    if amount_first > amount0: # * amount0 / weth_amt:
+                    if amount_first > 0: # * amount0 / weth_amt:
                         
                         #print(f'From pool fee: {fee} to pool: {fee0}')
                         #print(f'{amount0 / weth_decimals} {weth_symbol} ->  {othr_symbol} -> {amount_first/weth_decimals} {weth_symbol}.')
@@ -377,15 +376,14 @@ async def get_possible_flashswap(used_pool, weth_amt):
                     amount0 = 2 * amount0
 
 
-
     if len(all_profitable_combos) > 0:
+
         max_combo = str(max(all_profitable_combos)).split(',')
-        max_profit = int(all_profitable_combos[f'{max_combo[0]},{max_combo[1]}'] * weth_decimals)
+        max_profit = int(all_profitable_combos[f'{max_combo[0]},{max_combo[1]},{max_combo[2]}'] * weth_decimals)
+        print(f"Profit: {max_profit /  weth_decimals} WETH.")
 
-        if max_profit > 0:
 
-            print("Profit of swapping optimal value...")
-            print(profit + "WETH")
+        if max_profit > 0.001:
             #print('Optimal Amount of WETH INPUT:')
             #print(max_combo[2])
             print("Started a flashswap")
@@ -394,6 +392,7 @@ async def get_possible_flashswap(used_pool, weth_amt):
             print("END Timer:")
             print(end-start)
             return True
+        
         else:
             False
 
@@ -401,6 +400,7 @@ async def get_possible_flashswap(used_pool, weth_amt):
         #end = time.time()
         #print("END Timer:")
         #print(end-start)
+        print("No possible combinations...")
         return False
             
 
