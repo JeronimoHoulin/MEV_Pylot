@@ -60,6 +60,7 @@ def flash_swap(token_through, fee0, fee1, amount_in):
 
     WETH = Web3.to_checksum_address('0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619')
     token_through = Web3.to_checksum_address(token_through)
+    amount_in = int(amount_in)
     fee0 = int(fee0)
     fee1 = int(fee1)
 
@@ -73,6 +74,7 @@ def flash_swap(token_through, fee0, fee1, amount_in):
 
     #params TO BE FOUD AUTOMATED:
     pool0, fee1, token_in, token_through, amount_in = pool0, fee1, WETH, token_through, amount_in
+    print(f"Params: {pool0, fee1, token_in, token_through, amount_in}")
 
 
     #Build ERC20 contract
@@ -101,9 +103,10 @@ def flash_swap(token_through, fee0, fee1, amount_in):
             time.sleep(15)
 
 
+
     #Check WETH Balance before flash loan:
 
-    init_balance = WETH_contract.functions.balanceOf(mm_address).call() / 1e18
+    #init_balance = WETH_contract.functions.balanceOf(mm_address).call() / 1e18
     print()
     print(f'Initiating Flash Swap with {amount_in/1e18} WETH')
     print('--------------------------')
@@ -149,6 +152,6 @@ def flash_swap(token_through, fee0, fee1, amount_in):
 
     """
 
-    
+
 
 

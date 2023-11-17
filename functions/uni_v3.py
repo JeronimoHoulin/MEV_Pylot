@@ -310,14 +310,14 @@ async def get_possible_flashswap(used_pool, weth_amt):
 
         for fee in all_fees:
 
-            amount0 = int( weth_amt * weth_decimals * 0.2) # start by testing 20% of the traded amount in pool x
-            max_amount = int(1.5 * weth_decimals)        #increase test amount by 2 untill 100% of traded amount. 
+            amount0 = int( weth_amt * weth_decimals * 0.5) # start by testing 20% of the traded amount in pool x
+            max_amount = int(weth_decimals)        #increase test amount by 2 untill 100% of traded amount. 
 
             if fee == fee0: #Same pool
                 pass
             else:
 
-                amount0 = int(-1 * amount0)
+                amount0 = int(-1 * amount0)   #convert to positive amt (-0.1 WETH => 0.1 WETH)
 
                 while amount0 < max_amount:
 
@@ -380,13 +380,11 @@ async def get_possible_flashswap(used_pool, weth_amt):
 
         max_combo = str(max(all_profitable_combos)).split(',')
         max_profit = int(all_profitable_combos[f'{max_combo[0]},{max_combo[1]},{max_combo[2]}'] * weth_decimals)
-        print(f"Profit: {max_profit /  weth_decimals} WETH.")
 
-
-        if max_profit > 0.001:
-            #print('Optimal Amount of WETH INPUT:')
-            #print(max_combo[2])
+        if max_profit > 0.002:
+            print(f"Expected profit: {max_profit /  weth_decimals} WETH.")
             print("Started a flashswap")
+            print(f'params: [{othr_token, max_combo[0], max_combo[1], max_combo[2]}]')
             flash_swap(othr_token, max_combo[0], max_combo[1], max_combo[2])
             end = time.time()
             print("END Timer:")
