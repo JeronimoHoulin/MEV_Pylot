@@ -89,7 +89,7 @@ async def get_event(all_whitelist_pools, loop):
                         other_amt = decoded_data['amount0'] / pool_meta['token0_decimals']
                         other_symb = pool_meta['token0_symbol']
 
-                    if weth_amt > 0.05:
+                    if weth_amt > 0.02:
                         print('--------------------- EVT --------------------------')
                         '''
                         print(f'Utilized pool: [{used_pool}]')

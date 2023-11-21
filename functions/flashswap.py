@@ -74,7 +74,7 @@ def flash_swap(token_through, fee0, fee1, amount_in):
 
     #params TO BE FOUD AUTOMATED:
     pool0, fee1, token_in, token_through, amount_in = pool0, fee1, WETH, token_through, amount_in
-    print(f"Params: {pool0, fee1, token_in, token_through, amount_in}")
+    #print(f"Params: {pool0, fee1, token_in, token_through, amount_in}")
 
 
     #Build ERC20 contract
@@ -91,8 +91,8 @@ def flash_swap(token_through, fee0, fee1, amount_in):
 
 
     allowance_granted = WETH_contract.functions.allowance(mm_address, flash_swap_adrs).call()
-    print("Allowance granted to Flash Loan Contract: " + str(allowance_granted/1e18) + ' WETH.')
-    print()
+    #print("Allowance granted to Flash Loan Contract: " + str(allowance_granted/1e18) + ' WETH.')
+    #print()
 
     
     if allowance_granted <= 0:
@@ -109,7 +109,6 @@ def flash_swap(token_through, fee0, fee1, amount_in):
     #init_balance = WETH_contract.functions.balanceOf(mm_address).call() / 1e18
     print()
     print(f'Initiating Flash Swap with {amount_in/1e18} WETH')
-    print('--------------------------')
     print()
 
     nonce = w3.eth.get_transaction_count(mm_address)

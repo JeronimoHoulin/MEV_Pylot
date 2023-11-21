@@ -205,5 +205,32 @@
         "token1_decimals": 1000000000000000000,
         "token0_symbol": "GHST",
         "token1_symbol": "WETH"
+    },
+    "0x4fe1269a585b141f11c3e144158f9f8823c7c0e7": {
+        "token0": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "token1": "0x9a71012b13ca4d3d0cdc72a177df3ef03b0e76a3",
+        "fee": "3000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "WETH",
+        "token1_symbol": "BAL"
+    },
+    "0xce5a1d5caff6bbc27ab94e7cd5cd0eaad5f63d43": {
+        "token0": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "token1": "0xd6a5ab46ead26f49b03bbb1f9eb1ad5c1767974a",
+        "fee": "3000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "WETH",
+        "token1_symbol": "EMON"
+    },
+    "0x99c92609de7abc6f5f4bb3070f98d0a6506b1449": {
+        "token0": "0x70c006878a5a50ed185ac4c87d837633923de296",
+        "token1": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+        "fee": "3000",
+        "token0_decimals": 1000000000000000000,
+        "token1_decimals": 1000000000000000000,
+        "token0_symbol": "REVV",
+        "token1_symbol": "WETH"
     }
 }

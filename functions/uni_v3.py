@@ -310,7 +310,7 @@ async def get_possible_flashswap(used_pool, weth_amt):
 
         for fee in all_fees:
 
-            amount0 = int( weth_amt * weth_decimals * 0.5) # start by testing 20% of the traded amount in pool x
+            amount0 = int( weth_amt * weth_decimals * 0.2) # start by testing 20% of the traded amount in pool x
             max_amount = int(weth_decimals)        #increase test amount by 2 untill 100% of traded amount. 
 
             if fee == fee0: #Same pool
@@ -332,7 +332,7 @@ async def get_possible_flashswap(used_pool, weth_amt):
                     ).call()[0]
 
 
-                    if amount_first > 0: #* amount0 / weth_decimals:
+                    if amount_first > 0.5 * amount0:
                         
                         #print(f'From pool fee: {fee0} to pool: {fee}')
                         #print(f'{amount0 / weth_decimals} {weth_symbol} ->  {othr_symbol} -> {amount_first/weth_decimals} {weth_symbol}.')
@@ -348,7 +348,7 @@ async def get_possible_flashswap(used_pool, weth_amt):
         for fee in all_fees:
 
             amount0 = int( weth_amt * weth_decimals * 0.2) # start by testing 20% of the traded amount in pool x
-            max_amount = int(1.5 * weth_decimals)        #increase test amount by 2 untill 100% of traded amount. 
+            max_amount = int(weth_decimals)        #increase test amount by 2 untill 100% of traded amount. 
 
             if fee == fee0:
                 pass
@@ -366,7 +366,7 @@ async def get_possible_flashswap(used_pool, weth_amt):
                     ).call()[0]
 
 
-                    if amount_first > 0: # * amount0 / weth_amt:
+                    if amount_first > 0.5 * amount0:
                         
                         #print(f'From pool fee: {fee} to pool: {fee0}')
                         #print(f'{amount0 / weth_decimals} {weth_symbol} ->  {othr_symbol} -> {amount_first/weth_decimals} {weth_symbol}.')
@@ -381,10 +381,10 @@ async def get_possible_flashswap(used_pool, weth_amt):
         max_combo = str(max(all_profitable_combos)).split(',')
         max_profit = int(all_profitable_combos[f'{max_combo[0]},{max_combo[1]},{max_combo[2]}'] * weth_decimals)
 
-        if max_profit > 0.002:
+        if max_profit / weth_decimals > 0.0015:
             print(f"Expected profit: {max_profit /  weth_decimals} WETH.")
-            print("Started a flashswap")
-            print(f'params: [{othr_token, max_combo[0], max_combo[1], max_combo[2]}]')
+            print("Started a flashswap...")
+            #print(f'params: [{othr_token, max_combo[0], max_combo[1], max_combo[2]}]')
             flash_swap(othr_token, max_combo[0], max_combo[1], max_combo[2])
             end = time.time()
             print("END Timer:")
