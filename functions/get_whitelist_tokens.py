@@ -13,9 +13,9 @@ def get_whitelist_tokens():
 
     tokens = resp['tokens']
 
-    top_10_tokens = tokens[3:15]
+    top_tokens = tokens[3:50]
 
-    for token in top_10_tokens:
+    for token in top_tokens:
         #print(token['address'])
         all_tokens.append(token['address'])
     

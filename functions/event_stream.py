@@ -6,8 +6,7 @@ from websockets import connect
 import os
 from dotenv import load_dotenv
 
-from uni_v3 import get_pools, get_possible_flashswap
-from get_whitelist_tokens import get_whitelist_tokens
+from uni_v3 import get_possible_flashswap
 
 import eth_abi
 
@@ -39,7 +38,7 @@ def decode_log_data(data):
 
 
 
-async def get_event(all_whitelist_pools, loop):
+async def get_event(all_whitelist_pools, min_gain, loop):
 
     all_pools = all_whitelist_pools
     params = {"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": ["logs", {"address":  all_pools}]}
@@ -89,7 +88,7 @@ async def get_event(all_whitelist_pools, loop):
                         other_amt = decoded_data['amount0'] / pool_meta['token0_decimals']
                         other_symb = pool_meta['token0_symbol']
 
-                    if weth_amt > 0.02:
+                    if weth_amt > 0.001:
                         print('--------------------- EVT --------------------------')
                         '''
                         print(f'Utilized pool: [{used_pool}]')
@@ -100,7 +99,7 @@ async def get_event(all_whitelist_pools, loop):
                         print('-----------------------------------------------')
                         '''
                         
-                        result = await get_possible_flashswap(pool_meta, weth_amt)
+                        result = await get_possible_flashswap(pool_meta, weth_amt, min_gain)
                         
                         if result == True:
                             loop.close()
@@ -116,32 +115,9 @@ async def get_event(all_whitelist_pools, loop):
                 pass
 
 
-
-
-
-
-
-whitelist_tokens = get_whitelist_tokens()
-all_whitelist_pools = []
-print("Fetching all whitelist pools...")
-print()
-for token in whitelist_tokens:
-    pools = get_pools(WETH, token)
-    for pool in pools:
-        all_whitelist_pools.append(pool['id'])
-
-
-
-
-
-
-
-
-def stream_txns(all_whitelist_pools):
+def stream_txns(all_whitelist_pools, min_gain):
     loop = asyncio.get_event_loop()
     
     while True:
-        loop.run_until_complete(get_event(all_whitelist_pools, loop))
+        loop.run_until_complete(get_event(all_whitelist_pools, min_gain, loop))
 
-
-stream_txns(all_whitelist_pools)

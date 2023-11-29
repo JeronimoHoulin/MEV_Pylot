@@ -2,62 +2,31 @@ import sys
 sys.path.append('./functions')
 
 from get_whitelist_tokens import get_whitelist_tokens
-from one_inch import get_quote
-from uni_v3 import get_imbalanced_pools
-from new_heads import stream_txns
-
+#from one_inch import get_quote
+from event_stream import stream_txns
+from uni_v3 import get_pools
 
 
 WETH = '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619'  #WETH
-amount_min = 0.1
-
+min_gain = 0.002
 
 
 #Avoids salmonella tokens easily...
 whitelist_tokens = get_whitelist_tokens()
 
+def loop_tokens(token_in, whitelist_tokens, min_gain):
 
-def loop_tokens(token_in, whitelist_tokens, amount_in):
-
-    while True:
-
-        print()
-        print("Re-Running...")
-
-        for token_through in whitelist_tokens:
-
-            print(f"Getting imbalances for token: {token_through}")
-
-            if token_through == token_in or token_through == '0x0000000000000000000000000000000000001010': 
-                pass
-            else:
-                get_imbalanced_pools(token0=token_in, token1=token_through, amount0=amount_in)
+    all_whitelist_pools = []
+    print("Fetching all whitelist pools...")
+    print()
+    for token in whitelist_tokens:
+        pools = get_pools(WETH, token)
+        for pool in pools:
+            all_whitelist_pools.append(pool['id'])
 
 
-    """
-
-    for token_out in whitelist_tokens:
-
-        amount_out = get_quote(token_in, token_out, amount_in) #1INCH API
-
-        uni_best_routes_v3(token_in=token_out, token_out=token_in, amount_in=amount_out)
-
-
-    """
-
-
-
-
-def imbalance_search():
-
-    '''NEW HEADS'''
-    stream_txns()
-
-
+    stream_txns(all_whitelist_pools, min_gain)
 
 if __name__ == '__main__':
-
-    loop_tokens(WETH, whitelist_tokens, amount_min)
+    loop_tokens(WETH, whitelist_tokens, min_gain)
     #imbalance_search()
-
-

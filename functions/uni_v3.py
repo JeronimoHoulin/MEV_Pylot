@@ -81,191 +81,7 @@ def get_pools(token_in, token_out):
     return matching_pools
 
 
-
-
-def get_best_quote(token_in, token_out, amount_in):
-
-    quote_addr = Web3.to_checksum_address('0x61fFE014bA17989E743c5F6cB21bF9697530B21e')
-    with open('abi/uni_quoter_v2.json') as f:
-        uni_quoter_abi = json.load(f)
-
-    quote_contract = w3.eth.contract(quote_addr, abi=uni_quoter_abi)
-
-    with open('abi/ERC20.json') as f:
-        erc_20_abi = json.load(f)
-    
-    token_in = Web3.to_checksum_address(token_in)
-    token_out = Web3.to_checksum_address(token_out)
-    token_in_contract = w3.eth.contract(address= token_in, abi=erc_20_abi)
-    token_out_contract = w3.eth.contract(address= token_out, abi=erc_20_abi)
-
-    token_in_decimals = 10 ** token_in_contract.functions.decimals().call()
-    token_out_decimals = 10 ** token_out_contract.functions.decimals().call()
-    token_in_symbol = token_in_contract.functions.symbol().call()
-    token_out_symbol = token_out_contract.functions.symbol().call()
-    print(f'Fetching best sell prices on Uni for {amount_in } {token_in_symbol}...')
-    amount_in = int( amount_in * token_in_decimals)
-
-
-    all_pools = get_pools(token_in, token_out)
-
-
-    for pool in all_pools:
-
-        if pool['feeTier']:
-        
-            #QUOTE  PATH
-            # Token_In  ->    X    ->    Y    -> Token_In
-            path = eth_abi.packed.encode_packed(['address','uint24','address'], [token_in, int(pool['feeTier']), token_out])
-            
-            amount_out  = quote_contract.functions.quoteExactInput(
-                path,
-                amount_in
-            ).call()[0]
-
-            print()
-            print(f'You can flip it for {amount_out / token_out_decimals} {token_out_symbol}')
-            print()
-
-        else:
-            payload = (
-                token_in, #address tokenIn;
-                token_out, #address tokenOut;
-                amount_in, #uint256 amountIn;
-                100, #uint24 fee;
-                0, #uint160 sqrtPriceLimitX96;
-            )
-            resp = quote_contract.functions.quoteExactInputSingle(
-                    payload
-                ).call()
-                    
-            amount_out = resp[0]
-            print()
-            print(f'You can flip it for {amount_out / token_out_decimals} {token_out_symbol}')
-
-
-
-
-#used for mannually checkingn token whitelist 1 by 1
-def get_imbalanced_pools(token0, token1, amount0):
-
-    quote_addr = Web3.to_checksum_address('0x61fFE014bA17989E743c5F6cB21bF9697530B21e')
-    with open('abi/uni_quoter_v2.json') as f:
-        uni_quoter_abi = json.load(f)
-
-    quote_contract = w3.eth.contract(quote_addr, abi=uni_quoter_abi)
-
-    with open('abi/ERC20.json') as f:
-        erc_20_abi = json.load(f)
-    
-    token0 = Web3.to_checksum_address(token0)
-    token1 = Web3.to_checksum_address(token1)
-    token0_contract = w3.eth.contract(address= token0, abi=erc_20_abi)
-    token1_contract = w3.eth.contract(address= token1, abi=erc_20_abi)
-    token0_decimals = 10 ** token0_contract.functions.decimals().call()
-    token1_decimals = 10 ** token1_contract.functions.decimals().call()
-    token0_symbol = token0_contract.functions.symbol().call()
-    token1_symbol = token1_contract.functions.symbol().call()
-    amount0 = int( amount0 * token0_decimals)
-
-
-    all_fees = [] #100, 500, 3000, 10000
-
-    all_pools = get_pools(token0, token1)
-
-    for pool in all_pools:
-        all_fees.append(int(pool['feeTier']))
-
-    
-    combinations = list(itertools.combinations_with_replacement(all_fees, 2))
-
-
-    max_amount = 10*amount0
-
-    if len(combinations) > 0:
-
-        all_profitable_combos = {}
-
-        while amount0 < max_amount:
-
-            #print(f'Trying with {amount0 / token0_decimals}')
-
-            for combo in combinations:
-
-
-                if combo[0] == combo[1]: #same pool...
-                    pass
-
-                else:
-
-                    #QUOTE  PATH
-                    path = eth_abi.packed.encode_packed(['address','uint24','address','uint24','address'], [token0, combo[0], token1, combo[1], token0])
-                    
-                    amount_first  = quote_contract.functions.quoteExactInput(
-                        path,
-                        amount0
-                    ).call()[0]
-
-
-                    if amount_first/token0_decimals > ( amount0 / token0_decimals):
-                        '''
-                        print(f'From p1: {combo[0]} to p3: {combo[1]}')
-                        print()
-                        print(f'{amount0 / token0_decimals} {token0_symbol} -> {amount_first / token1_decimals} {token1_symbol}.')
-                        print(f'{amount_first / token1_decimals} {token1_symbol} -> {amount_first/token0_decimals} {token0_symbol}.')
-                        print()
-                        '''
-
-                        all_profitable_combos[f'{combo[0]},{combo[1]}'] = amount0 / token0_decimals
-
-                        #flash_swap(token1, combo[0], combo[1], amount0)
-                        #break
-
-
-
-                    ################### OTHER WAY AROUND POOL2 -> POOL1
-
-                    #QUOTE  PATH
-                    path = eth_abi.packed.encode_packed(['address','uint24','address','uint24','address'], [token0, combo[1], token1, combo[0], token0])
-                    
-                    amount_first  = quote_contract.functions.quoteExactInput(
-                        path,
-                        amount0
-                    ).call()[0]
-
-
-                    if amount_first/token0_decimals > ( amount0 / token0_decimals):
-                        '''
-                        print(f'From p1: {combo[1]} to p3: {combo[0]}')
-                        print()
-                        print(f'{amount0 / token0_decimals} {token0_symbol} -> {amount_first / token1_decimals} {token1_symbol}.')
-                        print(f'{amount_first / token1_decimals} {token1_symbol} -> {amount_first/token0_decimals} {token0_symbol}.')
-                        print()
-                        '''
-
-                        #flash_swap(token1, combo[1], combo[0], amount0)
-                        #break
-
-                        all_profitable_combos[f'{combo[1]},{combo[0]}'] = amount0 / token0_decimals
-
-
-            
-            amount0 = int(1.5*amount0)
-
-        if len(all_profitable_combos):
-            max_combo = str(max(all_profitable_combos)).split(',')
-            print(f'Pool combo: {max_combo}')
-            print(all_profitable_combos[f'{max_combo[0]},{max_combo[1]}']) 
-            print('Optimal Amount of WETH for Swap:')
-            #optimal_amount_in = int(all_profitable_combos[f'{max_combo[0]},{max_combo[1]}'] * token0_decimals)
-            #flash_swap(token1, max_combo[0], max_combo[1], optimal_amount_in)
-        else:
-            pass
-
-
-
-#used for new headers
-async def get_possible_flashswap(used_pool, weth_amt):
+async def get_possible_flashswap(used_pool, weth_amt, min_gain):
 
     start = time.time()
     
@@ -310,7 +126,7 @@ async def get_possible_flashswap(used_pool, weth_amt):
 
         for fee in all_fees:
 
-            amount0 = int( weth_amt * weth_decimals * 0.2) # start by testing 20% of the traded amount in pool x
+            amount0 = int( weth_amt * weth_decimals * 0.5) # start by testing 20% of the traded amount in pool x
             max_amount = int(weth_decimals)        #increase test amount by 2 untill 100% of traded amount. 
 
             if fee == fee0: #Same pool
@@ -347,7 +163,7 @@ async def get_possible_flashswap(used_pool, weth_amt):
 
         for fee in all_fees:
 
-            amount0 = int( weth_amt * weth_decimals * 0.2) # start by testing 20% of the traded amount in pool x
+            amount0 = int( weth_amt * weth_decimals * 0.5) # start by testing 20% of the traded amount in pool x
             max_amount = int(weth_decimals)        #increase test amount by 2 untill 100% of traded amount. 
 
             if fee == fee0:
@@ -381,7 +197,7 @@ async def get_possible_flashswap(used_pool, weth_amt):
         max_combo = str(max(all_profitable_combos)).split(',')
         max_profit = int(all_profitable_combos[f'{max_combo[0]},{max_combo[1]},{max_combo[2]}'] * weth_decimals)
 
-        if max_profit / weth_decimals > 0.0015:
+        if max_profit / weth_decimals > min_gain:
             print(f"Expected profit: {max_profit /  weth_decimals} WETH.")
             print("Started a flashswap...")
             #print(f'params: [{othr_token, max_combo[0], max_combo[1], max_combo[2]}]')
@@ -398,29 +214,6 @@ async def get_possible_flashswap(used_pool, weth_amt):
         #end = time.time()
         #print("END Timer:")
         #print(end-start)
-        print("No possible combinations...")
+        #print("No possible combinations...")
         return False
             
-
-
-
-
-
-
-
-
-
-def uni_best_routes_v3(token_in, token_out, amount_in):
-
-
-    #get_best_quote(token_in, token_out, amount_in)
-
-
-    get_imbalanced_pools(token_in, token_out, amount_in)
-
-
-    #print("Getting flashswap...")
-    #get_possible_flashswap(token_in, token_out, amount_in, fee0)
-
-
-
