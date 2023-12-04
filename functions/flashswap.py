@@ -30,17 +30,11 @@ flash_swap_adrs = Web3.to_checksum_address(os.environ.get('FLASH_SWAP_ADDRSS')) 
 os.chdir('C:/Users/jeron/OneDrive/Desktop/Projects/Web3py')
 
 
-def approve_felashswap():
+def approve_flashswap(token_in_contract):
     #APPROVE THE FLASH LOAN ABI contract (ADD IF NO APPROVAL)
     nonce = w3.eth.get_transaction_count(mm_address)
 
-    WETH = Web3.to_checksum_address('0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619')
-    #Build ERC20 contract
-    with open('abi/ERC20.json') as f:
-        erc_abi =  json.load(f)
-    WETH_contract = w3.eth.contract(address=WETH, abi=erc_abi)
-
-    txn = WETH_contract.functions.approve(flash_swap_adrs, int(100*1e18)).build_transaction({
+    txn = token_in_contract.functions.approve(flash_swap_adrs, int(100*1e18)).build_transaction({
         'from':mm_address,
         'nonce': int(nonce)
         })
@@ -50,7 +44,7 @@ def approve_felashswap():
     return tx.hex()
 
 
-def flash_swap(token_through, fee0, fee1, amount_in):
+def flash_swap(token_in, symb, token_through, fee0, fee1, amount_in):
 
     uni_factory_adrs = Web3.to_checksum_address('0x1F98431c8aD98523631AE4a59f267346ea31F984')
 
@@ -58,14 +52,14 @@ def flash_swap(token_through, fee0, fee1, amount_in):
         uni_factory_abi = json.load(f)
     uni_factory_contract  = w3.eth.contract(uni_factory_adrs, abi=uni_factory_abi)
 
-    WETH = Web3.to_checksum_address('0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619')
+    token_in = Web3.to_checksum_address(token_in)
     token_through = Web3.to_checksum_address(token_through)
     amount_in = int(amount_in)
     fee0 = int(fee0)
     fee1 = int(fee1)
 
     pool0 = uni_factory_contract.functions.getPool(
-        WETH,
+        token_in,
         token_through,
         fee0
     ).call()
@@ -73,14 +67,14 @@ def flash_swap(token_through, fee0, fee1, amount_in):
     pool0 = Web3.to_checksum_address(pool0)
 
     #params TO BE FOUD AUTOMATED:
-    pool0, fee1, token_in, token_through, amount_in = pool0, fee1, WETH, token_through, amount_in
+    pool0, fee1, token_in, token_through, amount_in = pool0, fee1, token_in, token_through, amount_in
     #print(f"Params: {pool0, fee1, token_in, token_through, amount_in}")
 
 
     #Build ERC20 contract
     with open('abi/ERC20.json') as f:
         erc_abi =  json.load(f)
-    WETH_contract = w3.eth.contract(address=WETH, abi=erc_abi)
+    token_in_contract = w3.eth.contract(address=token_in, abi=erc_abi)
 
 
     #connect the FLACHLOAN CONTRACT & ABI
@@ -90,13 +84,13 @@ def flash_swap(token_through, fee0, fee1, amount_in):
     flash_swap_contract = w3.eth.contract(flash_swap_adrs, abi=flash_loan_abi)
 
 
-    allowance_granted = WETH_contract.functions.allowance(mm_address, flash_swap_adrs).call()
-    #print("Allowance granted to Flash Loan Contract: " + str(allowance_granted/1e18) + ' WETH.')
+    allowance_granted = token_in_contract.functions.allowance(mm_address, flash_swap_adrs).call()
+    #print("Allowance granted to Flash Loan Contract: " + str(allowance_granted/1e18) + ' {symb}.')
     #print()
 
     
     if allowance_granted <= 0:
-        tx = approve_felashswap()      
+        tx = approve_flashswap(token_in_contract)      
         if tx:
             pass
         else:
@@ -105,10 +99,10 @@ def flash_swap(token_through, fee0, fee1, amount_in):
 
 
     #Check WETH Balance before flash loan:
-
-    #init_balance = WETH_contract.functions.balanceOf(mm_address).call() / 1e18
+    token_in_decimals = token_in_contract.functions.decimals().call()
+    #init_balance = token_in_contract.functions.balanceOf(mm_address).call() / token_in_decimals
     print()
-    print(f'Initiating Flash Swap with {amount_in/1e18} WETH')
+    print(f'Initiating Flash Swap with {amount_in/(10 ** token_in_decimals)} {symb}')
     print()
 
     nonce = w3.eth.get_transaction_count(mm_address)
@@ -136,20 +130,6 @@ def flash_swap(token_through, fee0, fee1, amount_in):
     print()
     print()
 
-    """
-    print(f'Balance Before: {init_balance} WETH')
-    print()
-    post_balance = WETH_contract.functions.balanceOf(mm_address).call() / 1e18
-
-    print(f'Balance After: {post_balance} WETH')
-    print()
-
-    if (post_balance >= init_balance):
-        print("WETH profit", post_balance - init_balance)
-    else:
-        print(swap)
-
-    """
 
 
 

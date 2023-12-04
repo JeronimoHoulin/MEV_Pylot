@@ -7,7 +7,7 @@ import eth_abi.packed
 import requests
 import itertools
 import time
-
+import datetime as dt
 from flashswap import flash_swap
 
 
@@ -48,7 +48,6 @@ def get_pools(token_in, token_out):
         if pool['id'] in existing_whitelist_pools:
             pass
         else:
-
             with open('abi/ERC20.json') as f:
                 erc_20_abi = json.load(f)
 
@@ -81,21 +80,21 @@ def get_pools(token_in, token_out):
     return matching_pools
 
 
-async def get_possible_flashswap(used_pool, weth_amt, min_gain):
+async def get_uni_flashswap(used_pool, in_amt, min_gain, symb):
 
     start = time.time()
     
-    if used_pool['token0_symbol'] == 'WETH':
-        weth_token = Web3.to_checksum_address(used_pool['token0'])
-        weth_decimals = used_pool['token0_decimals']
-        weth_symbol = used_pool['token0_symbol']
+    if used_pool['token0_symbol'] == symb:
+        in_token = Web3.to_checksum_address(used_pool['token0'])
+        in_decimals = used_pool['token0_decimals']
+        #in_symbol = used_pool['token0_symbol']
         othr_token = Web3.to_checksum_address(used_pool['token1'])
         #othr_decimals = used_pool['token1_decimals']
         othr_symbol = used_pool['token1_symbol']
     else:
-        weth_token = Web3.to_checksum_address(used_pool['token1'])
-        weth_decimals = used_pool['token1_decimals']
-        weth_symbol = used_pool['token1_symbol']
+        in_token = Web3.to_checksum_address(used_pool['token1'])
+        in_decimals = used_pool['token1_decimals']
+        #in_symbol = used_pool['token1_symbol']
         othr_token = Web3.to_checksum_address(used_pool['token0'])
         #othr_decimals = used_pool['token0_decimals']
         othr_symbol = used_pool['token0_symbol']
@@ -122,12 +121,12 @@ async def get_possible_flashswap(used_pool, weth_amt, min_gain):
     all_profitable_combos = {}
 
 
-    if weth_amt < 0: #WETH SOLD IN POOL FEE0
+    if in_amt < 0: #WETH SOLD IN POOL FEE0
 
         for fee in all_fees:
 
-            amount0 = int( weth_amt * weth_decimals * 0.5) # start by testing 20% of the traded amount in pool x
-            max_amount = int(weth_decimals)        #increase test amount by 2 untill 100% of traded amount. 
+            amount0 = int( in_amt * in_decimals * 0.5) # start by testing 20% of the traded amount in pool x
+            max_amount = int(in_decimals)        #increase test amount by 2 untill 100% of traded amount. 
 
             if fee == fee0: #Same pool
                 pass
@@ -137,10 +136,10 @@ async def get_possible_flashswap(used_pool, weth_amt, min_gain):
 
                 while amount0 < max_amount:
 
-                    #print(f"Going over pool {fee}, see if it's profitable with a amt { - amount0 / weth_decimals}...")
+                    #print(f"Going over pool {fee}, see if it's profitable with a amt { - amount0 / in_decimals}...")
 
                     # Buy in recently underpriced fee0 and sell in fee
-                    path = eth_abi.packed.encode_packed(['address','uint24','address','uint24','address'], [weth_token, fee0, othr_token, fee, weth_token])
+                    path = eth_abi.packed.encode_packed(['address','uint24','address','uint24','address'], [in_token, fee0, othr_token, fee, in_token])
                     
                     amount_first =  quote_contract.functions.quoteExactInput(
                         path,
@@ -151,9 +150,9 @@ async def get_possible_flashswap(used_pool, weth_amt, min_gain):
                     if amount_first > 0.5 * amount0:
                         
                         #print(f'From pool fee: {fee0} to pool: {fee}')
-                        #print(f'{amount0 / weth_decimals} {weth_symbol} ->  {othr_symbol} -> {amount_first/weth_decimals} {weth_symbol}.')
+                        #print(f'{amount0 / in_decimals} {in_symbol} ->  {othr_symbol} -> {amount_first/in_decimals} {in_symbol}.')
 
-                        profit = ( amount_first - amount0 * 0.997 ) / weth_decimals #FLASH LOAN FEE 0.03%
+                        profit = ( amount_first - amount0 * 0.997 ) / in_decimals #FLASH LOAN FEE 0.03%
                         all_profitable_combos[f'{fee0},{fee},{amount0}'] = profit
                     
                     amount0 = 2 * amount0
@@ -163,18 +162,18 @@ async def get_possible_flashswap(used_pool, weth_amt, min_gain):
 
         for fee in all_fees:
 
-            amount0 = int( weth_amt * weth_decimals * 0.5) # start by testing 20% of the traded amount in pool x
-            max_amount = int(weth_decimals)        #increase test amount by 2 untill 100% of traded amount. 
+            amount0 = int( in_amt * in_decimals * 0.5) # start by testing 20% of the traded amount in pool x
+            max_amount = int(in_decimals)        #increase test amount by 2 untill 100% of traded amount. 
 
             if fee == fee0:
                 pass
             else:
                 while amount0 < max_amount:
 
-                    #print(f"Going over pool {fee}, see if it's profitable with a amt {amount0 / weth_decimals}...")
+                    #print(f"Going over pool {fee}, see if it's profitable with a amt {amount0 / in_decimals}...")
 
                     # Buy in fee and sell in recently overpriced pool fee0
-                    path = eth_abi.packed.encode_packed(['address','uint24','address','uint24','address'], [weth_token, fee, othr_token, fee0, weth_token])
+                    path = eth_abi.packed.encode_packed(['address','uint24','address','uint24','address'], [in_token, fee, othr_token, fee0, in_token])
                     
                     amount_first  = quote_contract.functions.quoteExactInput(
                         path,
@@ -185,8 +184,8 @@ async def get_possible_flashswap(used_pool, weth_amt, min_gain):
                     if amount_first > 0.5 * amount0:
                         
                         #print(f'From pool fee: {fee} to pool: {fee0}')
-                        #print(f'{amount0 / weth_decimals} {weth_symbol} ->  {othr_symbol} -> {amount_first/weth_decimals} {weth_symbol}.')
-                        profit = ( amount_first - amount0 * 0.997 ) / weth_decimals #FLASH LOAN FEE 0.03%
+                        #print(f'{amount0 / in_decimals} {in_symbol} ->  {othr_symbol} -> {amount_first/in_decimals} {in_symbol}.')
+                        profit = ( amount_first - amount0 * 0.997 ) / in_decimals #FLASH LOAN FEE 0.03%
                         all_profitable_combos[f'{fee},{fee0},{amount0}'] = profit
 
                     amount0 = 2 * amount0
@@ -195,20 +194,19 @@ async def get_possible_flashswap(used_pool, weth_amt, min_gain):
     if len(all_profitable_combos) > 0:
 
         max_combo = str(max(all_profitable_combos)).split(',')
-        max_profit = int(all_profitable_combos[f'{max_combo[0]},{max_combo[1]},{max_combo[2]}'] * weth_decimals)
-
-        if max_profit / weth_decimals > min_gain:
-            print(f"Expected profit: {max_profit /  weth_decimals} WETH.")
+        max_profit = int(all_profitable_combos[f'{max_combo[0]},{max_combo[1]},{max_combo[2]}'] * in_decimals)
+        if max_profit / in_decimals > min_gain:
+            print(f"Expected profit: {max_profit /  in_decimals} {symb}.")
             print("Started a flashswap...")
             #print(f'params: [{othr_token, max_combo[0], max_combo[1], max_combo[2]}]')
-            flash_swap(othr_token, max_combo[0], max_combo[1], max_combo[2])
+            flash_swap(in_token, symb, othr_token, max_combo[0], max_combo[1], max_combo[2])
             end = time.time()
             print("END Timer:")
             print(end-start)
             return True
         
         else:
-            False
+            return False
 
     else:
         #end = time.time()
@@ -217,3 +215,108 @@ async def get_possible_flashswap(used_pool, weth_amt, min_gain):
         #print("No possible combinations...")
         return False
             
+
+
+async def uni_quick_flashwsap(used_pool, in_amt, other_amt, min_gain, symb):
+
+    ''' For testing...
+    traded_eth = 0.6
+    used_pool, in_amt, other_amt, min_gain, symb =     {
+            "token0": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+            "token1": "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
+            "fee": "3000",
+            "token0_decimals": 1000000000000000000,
+            "token1_decimals": 1000000000000000000,
+            "token0_symbol": "WETH",
+            "token1_symbol": "DAI"
+        }, traded_eth, -traded_eth*2030, 0, "WETH"
+    '''
+
+    if used_pool['token0_symbol'] == symb:
+        in_token = Web3.to_checksum_address(used_pool['token0'])
+        in_decimals = used_pool['token0_decimals']
+        in_symbol = used_pool['token0_symbol']
+        othr_token = Web3.to_checksum_address(used_pool['token1'])
+        othr_decimals = used_pool['token1_decimals']
+        othr_symbol = used_pool['token1_symbol']
+    else:
+        in_token = Web3.to_checksum_address(used_pool['token1'])
+        in_decimals = used_pool['token1_decimals']
+        in_symbol = used_pool['token1_symbol']
+        othr_token = Web3.to_checksum_address(used_pool['token0'])
+        othr_decimals = used_pool['token0_decimals']
+        othr_symbol = used_pool['token0_symbol']
+
+    #UNISWAPV3 Quoterv2.
+    """ Router to use in smart contract: 0xE592427A0AEce92De3Edee1F18E0157C05861564"""
+    uni_quote_addr = Web3.to_checksum_address('0x61fFE014bA17989E743c5F6cB21bF9697530B21e')
+    with open('abi/uni_quoter_v2.json') as f:
+        uni_quoter_abi = json.load(f)
+    uni_quote_contract = w3.eth.contract(uni_quote_addr, abi=uni_quoter_abi)
+
+    #SushiSwapV3 Quoter:
+    """ Router to use in smart contract: xxx"""
+    '''
+    suhsi_quote_addr = Web3.to_checksum_address('0xb1E835Dc2785b52265711e17fCCb0fd018226a6e')
+    with open('abi/uni_quoter_v2.json') as f:
+        sushi_quoter_abi = json.load(f)
+    sushi_quote_contract = w3.eth.contract(suhsi_quote_addr, abi=sushi_quoter_abi)
+    '''
+    #CHECK: https://github.com/sushiswap/v3-periphery/tree/master/deployments/polygon
+
+    #Quickswap Quoter:
+    """Router to use in smart contract: 0xf5b509bB0909a69B1c207E495f687a596C168E12""" #Quoter fails: 0xa15F0D7377B2A0C0c10db057f641beD21028FC89
+    quick_quote_addr = Web3.to_checksum_address('0xa15F0D7377B2A0C0c10db057f641beD21028FC89')
+    with open('abi/quick_quoter.json') as f:
+        quick_quoter_abi = json.load(f)
+    quick_quote_contract = w3.eth.contract(quick_quote_addr, abi=quick_quoter_abi)
+
+    fee0 = int(used_pool['fee'])
+    #all_fees = [100, 500, 3000, 10000]
+
+    if in_amt > 0: #In amount bought, other amount sold (-) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        other_amt = - int(other_amt * othr_decimals)
+        in_amt = int(in_amt * in_decimals)
+
+
+        # Single Hop on Quickswap:
+        ''' Buy cheap on QS '''
+        try: 
+            path = eth_abi.packed.encode_packed(['address','address'], [othr_token, in_token])
+            res = quick_quote_contract.functions.quoteExactInput(
+                path,
+                other_amt
+            ).call()
+
+            in_token_amt = res[0]
+            fee = res[1]
+
+            print(f"Swap {other_amt / othr_decimals} {othr_symbol} for {in_token_amt / in_decimals} {in_symbol} on QuickSwap (fee: {fee}).")
+
+        except:
+            print("QuickSwap pool not supported...")
+            return False
+            
+        try:
+            # Single Hop on Uniswap:
+            #print(f" -> Original {in_symbol} bought in poolfee: {fee0}")
+            #for fee in all_fees:
+            ''' Sell expensive on US '''
+            path = eth_abi.packed.encode_packed(['address','uint24','address'], [in_token, fee0, othr_token])
+            
+            amount_other_out =  uni_quote_contract.functions.quoteExactInput(
+                path,
+                in_amt
+            ).call()[0]
+
+            print(f"Swap {in_amt / in_decimals} {in_symbol} for {amount_other_out / othr_decimals} {othr_symbol} on UniSwap (fee: {fee0}).")
+            print()
+            print(f"Profit: {(other_amt - amount_other_out) / othr_decimals} {othr_symbol}")
+            return True
+
+
+        except:
+            print("Uniswap pool not supported...")
+            return False
+
