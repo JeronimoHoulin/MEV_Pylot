@@ -66,7 +66,8 @@ async def get_event(all_whitelist_pools, min_gain, symb, loop):
                         whitelist_pools = json.load(f)
 
                     pool_meta = whitelist_pools[f'{used_pool}']
-
+                    
+                    #A negative amount means the token was removed from the pool (i.e. Bought, not Sold).
                     if pool_meta['token0_symbol'] == symb:
                         in_amt = decoded_data['amount0'] / pool_meta['token0_decimals']
                         other_amt = decoded_data['amount1'] / pool_meta['token1_decimals']
@@ -76,16 +77,21 @@ async def get_event(all_whitelist_pools, min_gain, symb, loop):
                         other_amt = decoded_data['amount0'] / pool_meta['token0_decimals']
                         other_symb = pool_meta['token0_symbol']
 
-                    if in_amt > 1.5:
+                    if - in_amt > 0.9:
                         print('--------------------- SWAP EVT. --------------------------')
                         print(f'Utilized pool: [{used_pool}]')
-                        print(f'Amount traded: {in_amt} {symb}')
-                        print(f'               {other_amt} {other_symb}')
-                        #print('Tx hash: ' + response['params']['result']['transactionHash'])
+                        print(f'Bought {-in_amt} {symb}')
+                        print(f'Sold {other_amt} {other_symb}')
+                        print('Tx hash: ' + response['params']['result']['transactionHash'])
                         result = await uni_quick_flashwsap(pool_meta, in_amt, other_amt, min_gain, symb)
-                        print("The result: ", result)
-                        print('----------------------------------------------------------')
                         print()
+                    elif in_amt > 10:
+                        print('--------------------- SWAP EVT. --------------------------')
+                        print(f'Utilized pool: [{used_pool}]')
+                        print(f'Bought {-other_amt} {other_symb}')
+                        print(f'Sold {in_amt} {symb}')
+                        print('Tx hash: ' + response['params']['result']['transactionHash'])
+
                 else:
                     pass
             except:

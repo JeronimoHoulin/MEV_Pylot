@@ -78,7 +78,7 @@ def flash_swap(token_in, symb, token_through, fee0, fee1, amount_in):
 
 
     #connect the FLACHLOAN CONTRACT & ABI
-    with open('abi/flash_loan_abi.json') as f:
+    with open('contracts/flash_loan_abi.json') as f:
         flash_loan_abi = json.load(f)
 
     flash_swap_contract = w3.eth.contract(flash_swap_adrs, abi=flash_loan_abi)

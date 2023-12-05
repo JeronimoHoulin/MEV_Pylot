@@ -5,11 +5,10 @@ from web3.middleware import geth_poa_middleware
 import json
 import eth_abi.packed
 import requests
-import itertools
 import time
 import datetime as dt
 from flashswap import flash_swap
-
+from one_inch import get_quote
 
 #Connecting to ENV file
 os.chdir('C:/Users/jeron/OneDrive/Desktop/Projects/Web3py') #Your CWD
@@ -254,34 +253,29 @@ async def uni_quick_flashwsap(used_pool, in_amt, other_amt, min_gain, symb):
         uni_quoter_abi = json.load(f)
     uni_quote_contract = w3.eth.contract(uni_quote_addr, abi=uni_quoter_abi)
 
-    #SushiSwapV3 Quoter:
-    """ Router to use in smart contract: xxx"""
-    '''
-    suhsi_quote_addr = Web3.to_checksum_address('0xb1E835Dc2785b52265711e17fCCb0fd018226a6e')
-    with open('abi/uni_quoter_v2.json') as f:
-        sushi_quoter_abi = json.load(f)
-    sushi_quote_contract = w3.eth.contract(suhsi_quote_addr, abi=sushi_quoter_abi)
-    '''
-    #CHECK: https://github.com/sushiswap/v3-periphery/tree/master/deployments/polygon
+    #SushiSwapV3 NO V3 POOLS IN SUSHISWAP.. look at factory: https://github.com/sushiswap/v3-periphery/tree/master/deployments/polygon
+    #This REKT is why: https://rekt.news/sushi-yoink-rekt/
 
     #Quickswap Quoter:
-    """Router to use in smart contract: 0xf5b509bB0909a69B1c207E495f687a596C168E12""" #Quoter fails: 0xa15F0D7377B2A0C0c10db057f641beD21028FC89
+    """Router to use in smart contract: 0xf5b509bB0909a69B1c207E495f687a596C168E12"""
     quick_quote_addr = Web3.to_checksum_address('0xa15F0D7377B2A0C0c10db057f641beD21028FC89')
-    with open('abi/quick_quoter.json') as f:
+    with open('abi/quick_quoter_v2.json') as f:
         quick_quoter_abi = json.load(f)
     quick_quote_contract = w3.eth.contract(quick_quote_addr, abi=quick_quoter_abi)
 
     fee0 = int(used_pool['fee'])
     #all_fees = [100, 500, 3000, 10000]
 
-    if in_amt > 0: #In amount bought, other amount sold (-) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if in_amt < 0: # - TOKEN means the token has been BOUGHT (i.e. taken out of pool)  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        other_amt = - int(other_amt * othr_decimals)
-        in_amt = int(in_amt * in_decimals)
+        other_amt = int(other_amt * othr_decimals /20)
+        in_amt =  - int(in_amt * in_decimals /20)
 
 
         # Single Hop on Quickswap:
         ''' Buy cheap on QS '''
+
+        '''
         try: 
             path = eth_abi.packed.encode_packed(['address','address'], [othr_token, in_token])
             res = quick_quote_contract.functions.quoteExactInput(
@@ -293,11 +287,14 @@ async def uni_quick_flashwsap(used_pool, in_amt, other_amt, min_gain, symb):
             fee = res[1]
 
             print(f"Swap {other_amt / othr_decimals} {othr_symbol} for {in_token_amt / in_decimals} {in_symbol} on QuickSwap (fee: {fee}).")
-
         except:
             print("QuickSwap pool not supported...")
-            return False
-            
+
+        '''
+        
+        in_token_amt = get_quote(othr_token, in_token, other_amt/othr_decimals)
+        print(f"Swap {other_amt / othr_decimals} {othr_symbol} for {in_token_amt} {in_symbol} on OneInch.")
+        in_token_amt = int(in_token_amt * in_decimals)
         try:
             # Single Hop on Uniswap:
             #print(f" -> Original {in_symbol} bought in poolfee: {fee0}")
@@ -307,16 +304,15 @@ async def uni_quick_flashwsap(used_pool, in_amt, other_amt, min_gain, symb):
             
             amount_other_out =  uni_quote_contract.functions.quoteExactInput(
                 path,
-                in_amt
+                in_token_amt
             ).call()[0]
 
-            print(f"Swap {in_amt / in_decimals} {in_symbol} for {amount_other_out / othr_decimals} {othr_symbol} on UniSwap (fee: {fee0}).")
+            print(f"Swap {in_token_amt / in_decimals} {in_symbol} for {amount_other_out / othr_decimals} {othr_symbol} on UniSwap (fee: {fee0}).")
             print()
-            print(f"Profit: {(other_amt - amount_other_out) / othr_decimals} {othr_symbol}")
-            return True
-
+            profit = (amount_other_out - other_amt) / othr_decimals
+            if(profit > 0 ):
+                print(f"Profit: {profit} {othr_symbol}")
 
         except:
             print("Uniswap pool not supported...")
-            return False
 
