@@ -261,15 +261,15 @@ async def uni_quick_flashwsap(used_pool, in_amt, other_amt, min_gain, symb):
     quick_quote_addr = Web3.to_checksum_address('0xa15F0D7377B2A0C0c10db057f641beD21028FC89')
     with open('abi/quick_quoter_v2.json') as f:
         quick_quoter_abi = json.load(f)
-    quick_quote_contract = w3.eth.contract(quick_quote_addr, abi=quick_quoter_abi)
+    #quick_quote_contract = w3.eth.contract(quick_quote_addr, abi=quick_quoter_abi)
 
     fee0 = int(used_pool['fee'])
     #all_fees = [100, 500, 3000, 10000]
 
     if in_amt < 0: # - TOKEN means the token has been BOUGHT (i.e. taken out of pool)  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        other_amt = int(other_amt * othr_decimals /20)
-        in_amt =  - int(in_amt * in_decimals /20)
+        other_amt = int(other_amt * othr_decimals)
+        in_amt =  - int(in_amt * in_decimals)
 
 
         # Single Hop on Quickswap:
