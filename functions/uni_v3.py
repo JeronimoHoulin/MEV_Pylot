@@ -8,13 +8,14 @@ import requests
 import time
 import datetime as dt
 from flashswap import flash_swap
-from one_inch import get_quote
+from one_inch import get_quote, get_swap_callback
 
 #Connecting to ENV file
 os.chdir('C:/Users/jeron/OneDrive/Desktop/Projects/Web3py') #Your CWD
 load_dotenv()
 
 HTTPS_PROVIDER = os.environ.get('HTTPS_PROVIDER')
+MM_ADRS = os.environ.get('MM_ADRS')
 
 #Creating Web3 instance
 w3 = Web3(Web3.HTTPProvider(HTTPS_PROVIDER))
@@ -292,8 +293,9 @@ async def uni_quick_flashwsap(used_pool, in_amt, other_amt, min_gain, symb):
 
         '''
         
-        in_token_amt = get_quote(othr_token, in_token, other_amt/othr_decimals)
-        print(f"Swap {other_amt / othr_decimals} {othr_symbol} for {in_token_amt} {in_symbol} on OneInch.")
+        #in_token_amt = get_quote(othr_token, in_token, other_amt/othr_decimals)
+        in_token_amt, call_data = get_swap_callback(othr_token, in_token, other_amt, MM_ADRS)
+        print(f"Swap {other_amt / othr_decimals} {othr_symbol} for {in_token_amt / in_decimals} {in_symbol} on OneInch.")
         in_token_amt = int(in_token_amt * in_decimals)
         try:
             # Single Hop on Uniswap:

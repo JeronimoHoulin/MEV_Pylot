@@ -152,20 +152,21 @@ def execute_swap(token_in, token_out, amount_in, address, private_key):
 
 
 def get_swap_callback(src, dst, amount, from_smartcontract):
+    try:
+        slippage = 0 #1%
+        apiUrl = f"https://api.1inch.dev/swap/v5.2/137/swap?src={src}&dst={dst}&amount={amount}&from={from_smartcontract}&slippage={slippage}&disableEstimate=true"
+        response = requests.get(apiUrl, headers=headers).json()
+        to_amt = response['toAmount']
+        callback_data = response['tx']['data']
+        return to_amt, callback_data
+    except:
+        print("1inch API err:")
+        print(response)
 
-    slippage = 1 #1%
-
-    apiUrl = f"https://api.1inch.dev/swap/v5.2/137/swap?src={src}&dst={dst}&amount={amount}&from={from_smartcontract}&slippage={slippage}"
-
-    response = requests.get(apiUrl, headers=headers)
-
-    print(response.json())
-
-
+'''
 get_swap_callback(Web3.to_checksum_address('0x7ceb23fd6bc0add59e62ac25578270cff1b9f619'), 
              Web3.to_checksum_address('0xc2132d05d31c914a87c6611c10748aeb04b58e8f'), 
-             10000000000000000, 
+             100000000000000000000000000, 
              MM_ADRS, )
-
-
+'''
 #https://ethereum.stackexchange.com/questions/129138/can-i-use-the-data-returned-from-1inchs-api-swap-to-perform-a-swap-from-a-smar
