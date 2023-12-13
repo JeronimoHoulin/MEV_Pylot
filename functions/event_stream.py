@@ -79,17 +79,22 @@ async def get_event(all_whitelist_pools, min_gain, symb, loop):
 
                     if - in_amt > 0.1:
 
-                        result = await uni_quick_flashwsap(pool_meta, in_amt, other_amt, min_gain, symb)
+                        profit = await uni_quick_flashwsap(pool_meta, in_amt, other_amt, min_gain, symb)
 
-                        if result == True:
-                            print('--------------------- Arbitrage Event --------------------------')
+                        if profit > 0:
+                            '''
+                            print('--------------------- Event --------------------------')
                             print(f'Utilized Univ3 pool: [{used_pool}]')
                             print(f'Bought {-in_amt} {symb}')
                             print(f'Sold {other_amt} {other_symb}')
                             print('Tx hash: ' + response['params']['result']['transactionHash'])
                             print()
+                            print(f"1inch swap {other_amt} {other_symb} -> WETH -> UniV3 swap -> {other_amt + profit} {other_symb}.")
+                            print(f"Profit: {profit} {other_symb}")
+                            print()
+                            print('-------------------------------------------------------')
+                            '''
 
-                        print()
                     '''
                     elif in_amt > 10:
                         print('--------------------- SWAP EVT. --------------------------')

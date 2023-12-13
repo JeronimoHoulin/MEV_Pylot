@@ -5,10 +5,10 @@ import json
 import time
 
 from web3.middleware import geth_poa_middleware
-
+from one_inch import get_swap_callback
 
 #Connecting to chain
-INFURA_HTTP = 'https://polygon-mainnet.infura.io/v3/7e452892f2204d6a90e814c4a03a7b1d'
+INFURA_HTTP = os.environ.get('HTTPS_PROVIDER')
 
 w3 = Web3(Web3.HTTPProvider(INFURA_HTTP))
 #inject middleware for POA chain Polygon
@@ -22,12 +22,12 @@ load_dotenv()
 mm_address = Web3.to_checksum_address(os.environ.get('MM_ADRS'))
 mm_pk = os.environ.get('MM_PK')
 
-flash_swap_adrs = Web3.to_checksum_address(os.environ.get('FLASH_SWAP_ADDRSS')) ############# DEPLOYED FLASHSWAP CONTRACT !!!!!!!!!!!
-#token_through = Web3.to_checksum_address('0xc2132d05d31c914a87c6611c10748aeb04b58e8f')
+############# DEPLOYED CONTRACTS !!!!!!!!!!!
+flash_swap_adrs = Web3.to_checksum_address(os.environ.get('FLASH_SWAP_ADDRSS')) 
+dodo_flash_adrs = Web3.to_checksum_address(os.environ.get('DEPLOYED_DODO_SWAP')) 
+DEPLOYED_DODO_SWAP = os.environ.get('DEPLOYED_DODO_SWAP')
 
-"""  PARAMETERS  """
 
-os.chdir('C:/Users/jeron/OneDrive/Desktop/Projects/Web3py')
 
 
 def approve_flashswap(token_in_contract):
@@ -132,5 +132,57 @@ def flash_swap(token_in, symb, token_through, fee0, fee1, amount_in):
 
 
 
+def dodo_loan_swap(flashLoanPool, loanToken, throughToken, loanAmount, minOutOneInch, _dataOneInch):
+    '''
+        address flashLoanPool, 
+        address loanToken, 
+        address throughToken, 
+        uint256 loanAmount, 
+        uint minOutOneInch, 
+        bytes memory _dataOneInch
+    '''
+    with open('contracts/dodo_loan_abi.json') as f:
+        dodo_loan_abi = json.load(f)
+    dodo_swap_contract = w3.eth.contract(dodo_flash_adrs, abi=dodo_loan_abi)
 
+    nonce = w3.eth.get_transaction_count(mm_address)
+
+    flash_arb = dodo_swap_contract.functions.dodoFlashLoan(
+        flashLoanPool, 
+        loanToken, 
+        throughToken, 
+        loanAmount, 
+        minOutOneInch, 
+        bytes.fromhex(_dataOneInch[2:]) # Remember to jump over 0x...
+    ).call()
+    
+    '''
+    .build_transaction({
+            'chainId': 137,
+            'gas': int(5000000),  # Increase the gas limit as needed
+            'gasPrice': w3.to_wei('150', 'gwei'),  # Set an appropriate gas price
+            'nonce': nonce,
+            'from': mm_address
+        })
+                
+    signed = w3.eth.account.sign_transaction(flash_arb, mm_pk)
+    tx_hash = w3.eth.send_raw_transaction(signed.rawTransaction)
+    print('----')
+    print(f'Flash Arbi Tx Hash: {tx_hash.hex()}')
+    print('----')
+
+    print()
+    print()
+    '''
+
+
+
+amount, callback = get_swap_callback('0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', 100000000, DEPLOYED_DODO_SWAP)
+
+dodo_loan_swap('0x813FddecCD0401c4Fa73B092b074802440544E52',
+                '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', 
+                '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', 
+                100000000, 
+                int(amount), 
+                callback)
 
