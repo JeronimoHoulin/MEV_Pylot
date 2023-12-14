@@ -156,12 +156,15 @@ def get_swap_callback(src, dst, amount, from_smartcontract):
         slippage = 0 #1%
         apiUrl = f"https://api.1inch.dev/swap/v5.2/137/swap?src={src}&dst={dst}&amount={amount}&from={from_smartcontract}&slippage={slippage}&disableEstimate=true"
         response = requests.get(apiUrl, headers=headers).json()
-        to_amt = response['toAmount']
-        callback_data = response['tx']['data']
-        return to_amt, callback_data
+        if response['tx']['data']:
+            to_amt = response['toAmount']
+            callback_data = response['tx']['data']
+            return to_amt, callback_data
+        else:
+            print(str(response))
     except:
-        print("1inch API err:")
-        print(response)
+        print()
+        print("1inch API err, response above...")
 
 '''
 get_swap_callback(Web3.to_checksum_address('0x7ceb23fd6bc0add59e62ac25578270cff1b9f619'), 

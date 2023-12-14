@@ -55,7 +55,7 @@ contract DODOFlashArbi is Ownable{
     
     constructor(address oneinchrouter, address initialOwner) Ownable(initialOwner) {
         AGGREGATION_ROUTER_V5 = oneinchrouter;
-        initial_owner = initial_owner;
+        initial_owner = initialOwner;
     }
 
 
@@ -96,24 +96,18 @@ contract DODOFlashArbi is Ownable{
     ///////// DODO LOAN
 
     function dodoFlashLoan(
-        address flashLoanPool, //You will take a loan from this DODOV2 pool
-        uint256 loanAmount,
-        address loanToken,
+        address flashLoanPool, 
+        address loanToken, 
+        address throughToken, 
+        uint256 loanAmount, 
         uint minOutOneInch, 
-        bytes calldata _dataOneInch
+        uint24 unifee,
+        bytes memory _dataOneInch
     ) external {
         //Note: The data can be structured with any variables required by your logic. The following code is just an example
-        address flashLoanBase = IDODO(flashLoanPool)._BASE_TOKEN_();
+        bytes memory data = abi.encode(flashLoanPool, loanToken, throughToken, loanAmount, minOutOneInch, unifee, _dataOneInch);
+        IDODO(flashLoanPool).flashLoan(loanAmount, 0, address(this), data);
 
-        if (flashLoanBase == loanToken) {
-            address through_token = IDODO(flashLoanPool)._QUOTE_TOKEN_();
-            bytes memory data = abi.encode(flashLoanPool, loanToken, through_token, loanAmount, minOutOneInch, _dataOneInch);
-            IDODO(flashLoanPool).flashLoan(loanAmount, 0, address(this), data);
-        } else {
-            address through_token = flashLoanBase;
-            bytes memory data = abi.encode(flashLoanPool, loanToken, through_token, loanAmount, minOutOneInch, _dataOneInch);
-            IDODO(flashLoanPool).flashLoan(0, loanAmount, address(this), data);
-        }
     }
 
 
@@ -131,7 +125,7 @@ contract DODOFlashArbi is Ownable{
 
         (bool succ, bytes memory responseData) = address(AGGREGATION_ROUTER_V5).call(_d);
         if (succ) {
-            (uint returnAmount, uint gasLeft) = abi.decode(responseData, (uint, uint));
+            (uint returnAmount, ) = abi.decode(responseData, (uint, uint));
             require(returnAmount >= minOut);
             return returnAmount;
         } else {
@@ -155,8 +149,8 @@ contract DODOFlashArbi is Ownable{
         uint256,
         bytes memory data
     ) internal {
-        (address flashLoanPool, address loanToken, address throughToken, uint256 loanAmount, uint minOutOneInch, bytes memory _dataOneInch) = abi
-            .decode(data, (address, address, address, uint256, uint, bytes));
+        (address flashLoanPool, address loanToken, address throughToken, uint256 loanAmount, uint minOutOneInch, uint24 unifee,  bytes memory _dataOneInch) = abi
+            .decode(data, (address, address, address, uint256, uint, uint24, bytes));
 
         require(
             sender == address(this) && msg.sender == flashLoanPool,
@@ -184,7 +178,10 @@ contract DODOFlashArbi is Ownable{
             assembly {
                 mstore(add(slicedData, 0x20), add(add(_dataOneInch, 0x24), dataLength))
             }
-            (address _c, SwapDescription memory desc, bytes memory _d) = abi.decode(slicedData, (address, SwapDescription, bytes));
+            (, SwapDescription memory desc, bytes memory _d) = abi.decode(slicedData, (address, SwapDescription, bytes));
+
+
+
 
             uint oneInchReturnAmount = oneInchSwap(minOutOneInch, desc, _d);
 
@@ -201,7 +198,7 @@ contract DODOFlashArbi is Ownable{
                 .ExactInputSingleParams({
                     tokenIn: throughToken,
                     tokenOut: loanToken,
-                    fee: 500, // pool fee 0.05%
+                    fee: unifee, 
                     recipient: address(this), //SC... NOT msg.sender
                     deadline: block.timestamp,
                     amountIn: oneInchReturnAmount,

@@ -295,6 +295,7 @@ async def uni_quick_flashwsap(used_pool, in_amount, other_amount, min_gain, symb
         in_token_amt, call_data = get_swap_callback(othr_token, in_token, other_amt, DEPLOYED_DODO_SWAP) #DODO CONTRACT WILL MAKE THE 1INCH SWAPS
         in_token_amt = int(in_token_amt)
         #print(f"Swap {other_amt / othr_decimals} {othr_symbol} for {in_token_amt / in_decimals} {in_symbol} on OneInch.")
+    
         try:
             # Single Hop on Uniswap:
             #print(f" -> Original {in_symbol} bought in poolfee: {fee0}")
@@ -315,7 +316,7 @@ async def uni_quick_flashwsap(used_pool, in_amount, other_amount, min_gain, symb
         #print()
         profit = (amount_other_out - other_amt) / othr_decimals
 
-        if(profit > 0.5 ):
+        if(profit > 10 ):
             print(f"Profit: {profit} {othr_symbol}")
             print()
             if othr_symbol in ('USDC', 'USDT'):
@@ -326,8 +327,9 @@ async def uni_quick_flashwsap(used_pool, in_amount, other_amount, min_gain, symb
                 dodo_pool = None
                 print(f"Get a DODO pool for {othr_symbol} token")
             if dodo_pool != None:
-                print(f'Initiating Flash Loan Arbitrage with {other_amt}.')
-                dodo_loan_swap(dodo_pool, othr_token, in_token, other_amt, in_token_amt,  bytes.fromhex(call_data))
+                print(f'Initiating Flash Loan Arbitrage with {other_amt/othr_decimals} {othr_symbol}.')
+                dodo_loan_swap(dodo_pool, othr_token, in_token, other_amt, in_token_amt, fee0, bytes.fromhex(call_data))
+                # flashLoanPool,  loanToken,  throughToken,  loanAmount,  minOutOneInch,  unifee,   memory _dataOneInch
 
 
 
