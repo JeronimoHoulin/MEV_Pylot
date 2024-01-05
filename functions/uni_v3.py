@@ -295,40 +295,37 @@ async def uni_quick_flashwsap(used_pool, in_amount, other_amount, min_gain, symb
         in_token_amt, call_data = get_swap_callback(othr_token, in_token, other_amt, DEPLOYED_DODO_SWAP) #DODO CONTRACT WILL MAKE THE 1INCH SWAPS
         in_token_amt = int(in_token_amt)
         #print(f"Swap {other_amt / othr_decimals} {othr_symbol} for {in_token_amt / in_decimals} {in_symbol} on OneInch.")
-    
-        try:
-            # Single Hop on Uniswap:
-            #print(f" -> Original {in_symbol} bought in poolfee: {fee0}")
-            #for fee in all_fees:
-            ''' Sell expensive on US '''
-            #print(in_token, fee0, othr_token)
-            path = eth_abi.packed.encode_packed(['address','uint24','address'], [in_token, fee0, othr_token])
-            
-            amount_other_out =  uni_quote_contract.functions.quoteExactInput(
-                path,
-                in_token_amt
-            ).call()[0]
 
-        except:
-            print("Uniswap pool not supported...")
+        #Single Hop on Uniswap:
+        #print(f" -> Original {in_symbol} bought in poolfee: {fee0}")
+        #for fee in all_fees:
+        ''' Sell expensive on US '''
+        #print(in_token, fee0, othr_token)
+        path = eth_abi.packed.encode_packed(['address','uint24','address'], [in_token, fee0, othr_token])
+        
+        amount_other_out =  uni_quote_contract.functions.quoteExactInput(
+            path,
+            in_token_amt
+        ).call()[0]
+
 
         #print(f"Swap {in_token_amt / in_decimals} {in_symbol} for {amount_other_out / othr_decimals} {othr_symbol} on UniSwap (fee: {fee0}).")
         #print()
         profit = (amount_other_out - other_amt) / othr_decimals
 
-        if(profit > 10 ):
-            print(f"Profit: {profit} {othr_symbol}")
-            print()
+        if(profit > 2):
+
             if othr_symbol in ('USDC', 'USDT'):
-                dodo_pool = '0x813FddecCD0401c4Fa73B092b074802440544E52'
+                dodo_pool = w3.to_checksum_address('0x813FddecCD0401c4Fa73B092b074802440544E52')
             elif othr_symbol == 'WBTC':
-                dodo_pool = '0x3D9d58cF6B1dD8Be3033CE8865F155FaC16186Cc'
+                dodo_pool = w3.to_checksum_address('0x3D9d58cF6B1dD8Be3033CE8865F155FaC16186Cc')
             else:
                 dodo_pool = None
                 print(f"Get a DODO pool for {othr_symbol} token")
             if dodo_pool != None:
+                print(f"Profit: {profit} !!")
                 print(f'Initiating Flash Loan Arbitrage with {other_amt/othr_decimals} {othr_symbol}.')
-                dodo_loan_swap(dodo_pool, othr_token, in_token, other_amt, in_token_amt, fee0, bytes.fromhex(call_data))
+                dodo_loan_swap(dodo_pool, othr_token, in_token, other_amt, in_token_amt, fee0, call_data)
                 # flashLoanPool,  loanToken,  throughToken,  loanAmount,  minOutOneInch,  unifee,   memory _dataOneInch
 
 

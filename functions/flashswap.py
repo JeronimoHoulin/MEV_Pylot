@@ -133,6 +133,7 @@ def flash_swap(token_in, symb, token_through, fee0, fee1, amount_in):
 
 
 def dodo_loan_swap(flashLoanPool, loanToken, throughToken, loanAmount, minOutOneInch, unifee, _dataOneInch):
+
     '''
         address flashLoanPool, 
         address loanToken, 
@@ -149,25 +150,21 @@ def dodo_loan_swap(flashLoanPool, loanToken, throughToken, loanAmount, minOutOne
     nonce = w3.eth.get_transaction_count(mm_address)
 
     flash_arb = dodo_swap_contract.functions.dodoFlashLoan(
-        flashLoanPool, 
-        loanToken, 
-        throughToken, 
-        loanAmount, 
-        minOutOneInch, 
-        unifee,
+        w3.to_checksum_address(flashLoanPool), 
+        w3.to_checksum_address(loanToken), 
+        w3.to_checksum_address(throughToken), 
+        int(loanAmount), 
+        int(minOutOneInch), 
+        int(unifee),
         bytes.fromhex(_dataOneInch[2:]) # Remember to jump over 0x...
     ).build_transaction({
             'chainId': 137,
-            'gas': int(500000),  # Increase the gas limit as needed
-            'gasPrice': w3.to_wei('130', 'gwei'),  # Set an appropriate gas price from API maybe ? => requests.get('https://gasstation-testnet.polygon.technology/v2').json()
+            'gas': int(1000000),  # Increase the gas limit as needed
+            'gasPrice': w3.to_wei('90', 'gwei'),  # Set an appropriate gas price from API maybe ? => requests.get('https://gasstation-testnet.polygon.technology/v2').json()
             'nonce': nonce,
             'from': mm_address
         })
 
-    print(flash_arb)
-    print(flash_arb.text())
-    print(str(flash_arb))
-                
     signed = w3.eth.account.sign_transaction(flash_arb, mm_pk)
     tx_hash = w3.eth.send_raw_transaction(signed.rawTransaction)
     print('----')
@@ -178,10 +175,9 @@ def dodo_loan_swap(flashLoanPool, loanToken, throughToken, loanAmount, minOutOne
     print()
     
 
-'''
-#test
-amount, callback = get_swap_callback('0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', 100000000, DEPLOYED_DODO_SWAP)
 
+#test
+'''
 dodo_loan_swap('0x813FddecCD0401c4Fa73B092b074802440544E52',
                 '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', 
                 '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', 
@@ -192,5 +188,3 @@ dodo_loan_swap('0x813FddecCD0401c4Fa73B092b074802440544E52',
 
 
 '''
-
-

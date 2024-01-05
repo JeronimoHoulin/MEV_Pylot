@@ -77,7 +77,8 @@ async def get_event(all_whitelist_pools, min_gain, symb, loop):
                         other_amt = decoded_data['amount0'] / pool_meta['token0_decimals']
                         other_symb = pool_meta['token0_symbol']
 
-                    if - in_amt > 0.1:
+                    if - in_amt > 0.2:
+
 
                         profit = await uni_quick_flashwsap(pool_meta, in_amt, other_amt, min_gain, symb)
 

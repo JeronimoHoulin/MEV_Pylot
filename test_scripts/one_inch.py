@@ -12,9 +12,6 @@ load_dotenv()
 
 HTTPS_PROVIDER = os.environ.get('HTTPS_PROVIDER')
 ONEINCH_API_KEY = os.environ.get('ONEINCH_API_KEY')
-MM_ADRS = os.environ.get('MM_ADRS')
-MM_PK = os.environ.get('MM_PK')
-
 
 headers = {
     "accept": "application/json",
@@ -58,9 +55,9 @@ def get_quote(token_in, token_out, amount_in):
                 
     if 'toAmount' in quote:
         amount_out = int(quote['toAmount'])
-        #print()
-        ##print(f'Swap {amount_in / token_in_decimals} {token_in_symbol} for: {amount_out / token_out_decimals} {token_out_symbol}')
-        #print()
+        print()
+        print(f'Swap {amount_in / token_in_decimals} {token_in_symbol} for: {amount_out / token_out_decimals} {token_out_symbol}')
+        print()
         amount_out = amount_out / token_out_decimals
         return amount_out
     else:
@@ -68,7 +65,7 @@ def get_quote(token_in, token_out, amount_in):
         amount_out = 0
         return amount_out
 
-#get_quote('0xc2132d05d31c914a87c6611c10748aeb04b58e8f', '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', 1)
+get_quote('0xc2132d05d31c914a87c6611c10748aeb04b58e8f', '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', 1)
 
 def approve_allowance(token_in, token_out, amount_in, address, private_key):
     
@@ -98,17 +95,17 @@ def approve_allowance(token_in, token_out, amount_in, address, private_key):
     msg.sender should have already given the router an allowance of at least amountIn on the input token.
     """
 
-    allowance = token_in_contract.functions.allowance(w3.to_checksum_address(address), one_inch_address).call()
-    print(f'Allowance to the Router through Contract: {str(allowance)} {token_in_symbol}')
+    allowance_granted = token_in_contract.functions.allowance(w3.to_checksum_address(address), one_inch_address).call()
+    print(f'Allowance to the Router through API: {str(allowance_granted)} {token_in_symbol}')
     
-    
+    """
     oneinch_url = f'https://api.1inch.dev/swap/v5.2/137/approve/allowance?tokenAddress={token_in}&walletAddress={address}'
     allowance = requests.get(oneinch_url, headers=headers).json()['allowance']
     print(f'Allowance to the Router through API: {str(allowance)} {token_in_symbol}')
-    
+    """
 
-    
-    if int(allowance) <= 0:
+    '''
+    if allowance_granted <= 0:
 
         nonce = w3.eth.get_transaction_count(address)
 
@@ -119,7 +116,7 @@ def approve_allowance(token_in, token_out, amount_in, address, private_key):
         signed = w3.eth.account.sign_transaction(txn, private_key)
         tx_hash = w3.eth.send_raw_transaction(signed.rawTransaction)
         tx = w3.eth.get_transaction(tx_hash)
-    
+    '''
     
 
 
@@ -141,39 +138,10 @@ def execute_swap(token_in, token_out, amount_in, address, private_key):
     amount_in = amount_in * token_in_decimals
 
     
-    slippage = 0.01 # x%
+    slippage = 1 # x%
 
     oneinch_url = f'https://api.1inch.dev/swap/v5.2/137/swap?src={token_in}&dst={token_out}&amount={amount_in}&from={address}&slippage={slippage}'
 
     swap_data = requests.get(oneinch_url, headers=headers).json()
 
     print(swap_data)
-
-
-
-def get_swap_callback(src, dst, amount, from_smartcontract):
-    try:
-        slippage = 1 #1%
-        apiUrl = f"https://api.1inch.dev/swap/v5.2/137/swap?src={src}&dst={dst}&amount={amount}&from={from_smartcontract}&slippage={slippage}&disableEstimate=true"
-        response = requests.get(apiUrl, headers=headers).json()
-        if 'tx' in response.keys():
-            to_amt = response['toAmount']
-            callback_data = response['tx']['data']
-            return to_amt, callback_data
-        else:
-            print("Unexpected response format:", response)
-
-    except requests.exceptions.RequestException as err:
-        print("1Inch API errr:", err)
-        print()
-        print(response)
-        print(apiUrl)
-
-
-'''
-get_swap_callback(Web3.to_checksum_address('0x7ceb23fd6bc0add59e62ac25578270cff1b9f619'), 
-             Web3.to_checksum_address('0xc2132d05d31c914a87c6611c10748aeb04b58e8f'), 
-             100000000000000000000000000, 
-             MM_ADRS, )
-'''
-#https://ethereum.stackexchange.com/questions/129138/can-i-use-the-data-returned-from-1inchs-api-swap-to-perform-a-swap-from-a-smar

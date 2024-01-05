@@ -6,7 +6,7 @@ from uni_v3 import get_pools
 import json 
 
 #The token you want to profit in (have a min of $10 worth for flash loan fees).
-token_in = '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619' #WETH
+token_in = '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619' #WETH
 symb = 'WETH'
 #Minimum expected profit for the txn to be executed. 
 min_gain = 0.001
